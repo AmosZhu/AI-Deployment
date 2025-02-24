@@ -1,0 +1,21 @@
+# Author: Dizhong Zhu
+# Date: 24/02/2025
+
+version: '3.8'
+
+services:
+  ollama-service:
+    container_name: ollama-service
+    image: ollama:latest
+    restart: always
+    ports:
+      - 11434:11434
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434  # Ensure Ollama binds to all network interfaces
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: [ '0' ]
+              capabilities: [ gpu ]
