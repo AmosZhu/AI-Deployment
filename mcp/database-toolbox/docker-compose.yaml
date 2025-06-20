@@ -1,0 +1,14 @@
+# Author: Dizhong Zhu
+# Date: 18/06/2025
+
+services:
+  genai-toolbox:
+    image: us-central1-docker.pkg.dev/database-toolbox/toolbox/toolbox:0.7.0
+    container_name: genai-toolbox-server
+    ports:
+      - "11001:5000"
+    volumes:
+      - ./tools.yaml:/app/tools.yaml:ro
+    command: [ "--tools-file", "/app/tools.yaml", "--address", "0.0.0.0" ]
+    restart: unless-stopped
+    network_mode: bridge

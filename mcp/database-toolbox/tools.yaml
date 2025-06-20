@@ -1,0 +1,64 @@
+# Author: Dizhong Zhu
+# Date: 18/06/2025
+
+sources:
+  merchants-db:
+    kind: postgres
+    host: webapp-engine-aurora-cluster.cluster-chbuh7sb1ev9.eu-west-2.rds.amazonaws.com
+    port: 5432
+    database: merchants
+    user: dizhong
+    password: 19890522
+
+tools:
+  list-all-schemas:
+    kind: postgres-sql
+    source: merchants-db
+    description: "List all schemas in the PostgreSQL database"
+    statement: |
+      SELECT schema_name 
+      FROM information_schema.schemata 
+      WHERE schema_name NOT IN ('information_schema', 'pg_catalog')
+      ORDER BY schema_name;
+
+  list-tables-in-schema:
+    kind: postgres-sql
+    source: merchants-db
+    description: "List all tables in a specific schema"
+    parameters:
+      - name: schema_name
+        type: string
+        description: "The name of the schema"
+    statement: |
+      SELECT table_name 
+      FROM information_schema.tables
+      WHERE table_schema = $1;
+
+  table-data-schema:
+    kind: postgres-sql
+    source: merchants-db
+    description: "Get the schema of a specific table in the specified schema"
+    parameters:
+      - name: table_name
+        type: string
+        description: "The name of the table to describe"
+      - name: schema_name
+        type: string
+        description: "The name of the schema"
+    statement: |
+      SELECT column_name, data_type
+      FROM information_schema.columns
+      WHERE table_schema = $2 AND table_name = $1;
+
+  execute-schema-query:
+    kind: postgres-execute-sql
+    source: merchants-db
+    description: "Execute a read query within a specific schema and return the result"
+
+toolsets:
+  # All your original functions
+  postgresql-agent:
+    - list-all-schemas
+    - list-tables-in-schema
+    - table-data-schema
+    - execute-schema-query
